@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <memory.h>
-#include "sha256.h" // functions sha256_init(), sha256_update(), sha256_final() are declared in this header file
+#include "sha256.h" // functions are declared in this header file
 
 #define ROTLEFT(a,b) (((a) << (b)) | ((a) >> (32-(b))))
 #define ROTRIGHT(a,b) (((a) >> (b)) | ((a) << (32-(b))))

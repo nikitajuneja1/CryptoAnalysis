@@ -59,12 +59,6 @@ void md5_init(md5_context *ctx){
 	ctx->buffer[3] = (uint32_t)D;
 }
 
-/*
- * Add some amount of input to the context
- *
- * If the input fills out a block of 512 bits, apply the algorithm (md5_steps)
- * and save the result in the buffer. Also updates the overall size.
- */
 
 void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 	uint32_t input[16];
@@ -75,9 +69,6 @@ void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 	for(unsigned int i = 0; i < input_len; ++i){
 		ctx->input[offset++] = (uint8_t)*(input_buffer + i);
 
-		// If we've filled our context input, copy it into our local array input
-		// then reset the offset to 0 and fill in a new buffer
-		// The local array input is a list of 16 32-bit words for use in the algorithm
 		if(offset % 64 == 0){
 			for(unsigned int j = 0; j < 16; ++j){
 				// Convert to little-endian
@@ -93,8 +84,8 @@ void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 }
 
 /*
- * Pad the current input to get to 448 bytes, append the size in bits to the very end,
- * and save the result of the final iteration into digest.
+ Pad the current input to get to 448 bytes and
+ append the size in bits to the very end
  */
 void md5_finalize(md5_context *ctx){
 	uint32_t input[16];
@@ -127,10 +118,6 @@ void md5_finalize(md5_context *ctx){
 		ctx->digest[(i * 4) + 3] = (uint8_t)((ctx->buffer[i] & 0xFF000000) >> 24);
 	}
 }
-
-/*
- * Step on 512 bits of input with the main MD5 algorithm.
- */
 
 void md5_steps(uint32_t *buffer, uint32_t *input){
 	uint32_t AA = buffer[0];
@@ -175,9 +162,6 @@ void md5_steps(uint32_t *buffer, uint32_t *input){
 	buffer[3] += DD;
 }
 
-/*
- * Functions that will return a pointer to the hash of the provided input
- */
 uint8_t* md5_string(char *input){
 	md5_context ctx;
 	md5_init(&ctx);
@@ -209,9 +193,7 @@ uint8_t* md5_file(FILE *file){
 	return result;
 }
 
-/*
- * Bit-manipulation functions defined by the MD5 algorithm
- */
+// Bit-manipulation functions //
 uint32_t F(uint32_t X, uint32_t Y, uint32_t Z){
 	return (X & Y) | (~X & Z);
 }
@@ -228,16 +210,12 @@ uint32_t I(uint32_t X, uint32_t Y, uint32_t Z){
 	return Y ^ (X | ~Z);
 }
 
-/*
- * Rotates a 32-bit word left by n bits
- */
+// Rotates a 32-bit word left by n bits //
 uint32_t rotate_left(uint32_t x, uint32_t n){
 	return (x << n) | (x >> (32 - n));
 }
 
-/*
- * Printing bytes from buffers or the hash
- */
+// Printing bytes from buffers or the hash //
 void print_bytes(void *p, size_t length){
 	uint8_t *pp = (uint8_t *)p;
 	for(unsigned int i = 0; i < length; ++i){

@@ -3,10 +3,8 @@
 #include <memory.h>
 #include "sha1.h"
 
-/****************************** MACROS ******************************/
 #define ROTLEFT(a, b) ((a << b) | (a >> (32 - b)))
 
-/*********************** FUNCTION DEFINITIONS ***********************/
 void sha1_transform(SHA1Context *context, const CHAR data[])
 {
 	INT a, b, c, d, e, i, j, t, m[80];
@@ -136,20 +134,3 @@ void sha1_final(SHA1Context *context, CHAR hash[])
 		hash[i + 16] = (context->Hash[4] >> (24 - i * 8)) & 0x000000ff;
 	}
 }
-// CHAR* sha1_string(char *input){
-// 	SHA1Context context;
-//   CHAR buf[SHA1HashSize];
-//   sha1_init(&context);
-// 	sha1_update(&context, (const CHAR)input, strlen(input));
-// 	sha1_final(&context, buf);
-//
-// 	CHAR *result = malloc(20);
-// 	memcpy(result, context.hash, 20);
-// 	return result;
-// }
-// void print_hash(CHAR *p){
-// 	for(unsigned int i = 0; i < 20; ++i){
-// 		printf("%02x", p[i]);
-// 	}
-// 	printf("\n");
-// }

@@ -6,7 +6,6 @@
 
 #define SHA1HashSize 20              // SHA1 outputs a 20 byte digest
 
-/**************************** DATA TYPES ****************************/
 typedef unsigned char CHAR;             // 8-bit byte
 typedef unsigned int  INT;             // 32-bit word, change to "long" for 16-bit machines
 

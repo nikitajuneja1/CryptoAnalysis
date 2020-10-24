@@ -46,9 +46,7 @@ static uint8_t PADDING[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-/*
- * Initialize a context
- */
+// context initialization //
 
 void md5_init(md5_context *ctx){
 	ctx->size = (uint64_t)0;
@@ -59,12 +57,6 @@ void md5_init(md5_context *ctx){
 	ctx->buffer[3] = (uint32_t)D;
 }
 
-/*
- * Add some amount of input to the context
- *
- * If the input fills out a block of 512 bits, apply the algorithm (md5_steps)
- * and save the result in the buffer. Also updates the overall size.
- */
 
 void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 	uint32_t input[16];
@@ -92,10 +84,7 @@ void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 	}
 }
 
-/*
- * Pad the current input to get to 448 bytes, append the size in bits to the very end,
- * and save the result of the final iteration into digest.
- */
+// Pad the current input to get to 448 bytes, append the size in bits to the very end //
 void md5_finalize(md5_context *ctx){
 	uint32_t input[16];
 	unsigned int offset = ctx->size % 64;
@@ -235,9 +224,7 @@ uint32_t rotate_left(uint32_t x, uint32_t n){
 	return (x << n) | (x >> (32 - n));
 }
 
-/*
- * Printing bytes from buffers or the hash
- */
+// Printing bytes from the hash generated //
 void print_bytes(void *p, size_t length){
 	uint8_t *pp = (uint8_t *)p;
 	for(unsigned int i = 0; i < length; ++i){
