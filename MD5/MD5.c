@@ -63,13 +63,10 @@ void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 	unsigned int offset = ctx->size % 64;
 	ctx->size += (uint64_t)input_len;
 
-	// Copy each byte in input_buffer into the next space in our context input
 	for(unsigned int i = 0; i < input_len; ++i){
 		ctx->input[offset++] = (uint8_t)*(input_buffer + i);
 
-		// If we've filled our context input, copy it into our local array input
-		// then reset the offset to 0 and fill in a new buffer
-		// The local array input is a list of 16 32-bit words for use in the algorithm
+
 		if(offset % 64 == 0){
 			for(unsigned int j = 0; j < 16; ++j){
 				// Convert to little-endian
@@ -90,12 +87,9 @@ void md5_finalize(md5_context *ctx){
 	unsigned int offset = ctx->size % 64;
 	unsigned int padding_length = offset < 56 ? 56 - offset : (56 + 64) - offset;
 
-	// Fill in the padding andndo the changes to size that resulted from the update
 	md5_update(ctx, PADDING, padding_length);
 	ctx->size -= (uint64_t)padding_length;
 
-	// Do a final update (internal to this function)
-	// Last two 32-bit words are the two halves of the size (converted from bytes to bits)
 	for(unsigned int j = 0; j < 14; ++j){
 		input[j] = (uint32_t)(ctx->input[(j * 4) + 3]) << 24 |
 		           (uint32_t)(ctx->input[(j * 4) + 2]) << 16 |
@@ -116,10 +110,6 @@ void md5_finalize(md5_context *ctx){
 		ctx->digest[(i * 4) + 3] = (uint8_t)((ctx->buffer[i] & 0xFF000000) >> 24);
 	}
 }
-
-/*
- * Step on 512 bits of input with the main MD5 algorithm.
- */
 
 void md5_steps(uint32_t *buffer, uint32_t *input){
 	uint32_t AA = buffer[0];
@@ -164,9 +154,6 @@ void md5_steps(uint32_t *buffer, uint32_t *input){
 	buffer[3] += DD;
 }
 
-/*
- * Functions that will return a pointer to the hash of the provided input
- */
 uint8_t* md5_string(char *input){
 	md5_context ctx;
 	md5_init(&ctx);
@@ -217,9 +204,7 @@ uint32_t I(uint32_t X, uint32_t Y, uint32_t Z){
 	return Y ^ (X | ~Z);
 }
 
-/*
- * Rotates a 32-bit word left by n bits
- */
+// Rotates a 32-bit word left by n bits //
 uint32_t rotate_left(uint32_t x, uint32_t n){
 	return (x << n) | (x >> (32 - n));
 }
