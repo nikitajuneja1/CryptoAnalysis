@@ -45,7 +45,8 @@ int test()
 	int pass = 1;
 
 	//For test1
-	printf("%s\n", text1 );
+	printf("\nString: %s\n\n", text1 );
+	printf("Output for different Hash Algorithms: \n\n");
 	printf("MD5: " );
 	result = md5_string(text1);
 	print_hash(result);
@@ -74,7 +75,8 @@ int test()
 	pass = pass && !memcmp(hash1, buf, SHA256_BLOCK_SIZE);
 
 	//for Test2
-	printf("\n%s\n", text2 );
+	printf("\nString: %s\n\n", text2 );
+	printf("Output for different Hash Algorithms: \n\n");
 	printf("MD5: " );
 	result = md5_string(text2);
 	print_hash(result);
@@ -101,7 +103,8 @@ int test()
   	pass = pass && !memcmp(hash2, buf, SHA256_BLOCK_SIZE);
 
 	//for Test3
-	printf("\n%s\n", text3 );
+	printf("\nString: %s\n\n", text3 );
+	printf("Output for different Hash Algorithms: \n\n");
 	printf("MD5: " );
 	result = md5_string(text3);
 	print_hash(result);
