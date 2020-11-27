@@ -46,9 +46,7 @@ static uint8_t PADDING[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-/*
- * Initialize a context
- */
+// context initialization //
 
 void md5_init(md5_context *ctx){
 	ctx->size = (uint64_t)0;
@@ -65,9 +63,9 @@ void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 	unsigned int offset = ctx->size % 64;
 	ctx->size += (uint64_t)input_len;
 
-	// Copy each byte in input_buffer into the next space in our context input
 	for(unsigned int i = 0; i < input_len; ++i){
 		ctx->input[offset++] = (uint8_t)*(input_buffer + i);
+
 
 		if(offset % 64 == 0){
 			for(unsigned int j = 0; j < 16; ++j){
@@ -83,21 +81,15 @@ void md5_update(md5_context *ctx, uint8_t *input_buffer, size_t input_len){
 	}
 }
 
-/*
- Pad the current input to get to 448 bytes and
- append the size in bits to the very end
- */
+// Pad the current input to get to 448 bytes, append the size in bits to the very end //
 void md5_finalize(md5_context *ctx){
 	uint32_t input[16];
 	unsigned int offset = ctx->size % 64;
 	unsigned int padding_length = offset < 56 ? 56 - offset : (56 + 64) - offset;
 
-	// Fill in the padding andndo the changes to size that resulted from the update
 	md5_update(ctx, PADDING, padding_length);
 	ctx->size -= (uint64_t)padding_length;
 
-	// Do a final update (internal to this function)
-	// Last two 32-bit words are the two halves of the size (converted from bytes to bits)
 	for(unsigned int j = 0; j < 14; ++j){
 		input[j] = (uint32_t)(ctx->input[(j * 4) + 3]) << 24 |
 		           (uint32_t)(ctx->input[(j * 4) + 2]) << 16 |
@@ -193,7 +185,9 @@ uint8_t* md5_file(FILE *file){
 	return result;
 }
 
-// Bit-manipulation functions //
+/*
+ * Bit-manipulation functions defined by the MD5 algorithm
+ */
 uint32_t F(uint32_t X, uint32_t Y, uint32_t Z){
 	return (X & Y) | (~X & Z);
 }
@@ -215,7 +209,7 @@ uint32_t rotate_left(uint32_t x, uint32_t n){
 	return (x << n) | (x >> (32 - n));
 }
 
-// Printing bytes from buffers or the hash //
+// Printing bytes from the hash generated //
 void print_bytes(void *p, size_t length){
 	uint8_t *pp = (uint8_t *)p;
 	for(unsigned int i = 0; i < length; ++i){
