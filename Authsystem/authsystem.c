@@ -9,6 +9,9 @@
 #define USERMAX 20
 
 char tmp_s[];
+CHAR buf[SHA256_BLOCK_SIZE];
+
+// Random String Generator
 void gen_random(const int len) {
 
     static const char alphanum[] =
@@ -22,10 +25,11 @@ void gen_random(const int len) {
         tmp_s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
 
 }
+
 void shaGenerator(CHAR *hashstring)
 {
 
-	CHAR buf[SHA256_BLOCK_SIZE];
+	// CHAR buf[SHA256_BLOCK_SIZE];
 	SHA256_Context context;
 
 	sha256_init(&context);
@@ -38,6 +42,7 @@ void shaGenerator(CHAR *hashstring)
 	for(unsigned int i = 0; i < SHA256_BLOCK_SIZE; ++i){
   		printf("%02x", buf[i]);
   	}
+    
     printf("\n");
 
 }
@@ -46,12 +51,43 @@ int main() {
     //char password[] = "aa";
     CHAR password[PASSMIN];
     CHAR username[USERMAX];
-    // for(int i=0; i < PASSMIN; ++i){
-    // scanf("%c", &password[i]);
-  	// }
-	printf("Username: " );
-	scanf("%s",username);
-	printf("Password: " );
+
+    // File Input 
+    FILE *fp;
+
+    int userFlag=0;
+
+    while(userFlag==0){
+        printf("Username: " );
+        scanf("%s",username);
+        
+        //For searching username
+        char username_file_location[] ="usernames.txt";
+        char fileUser[30];
+        fp = fopen(username_file_location, "a+");
+
+        while(!feof(fp)){
+
+            fscanf(fp,"%s",fileUser);
+
+            if(strcmp(fileUser,username)==0){
+                printf("This username already exists.\n");
+                userFlag=0;
+                break;
+            }
+            else{
+                userFlag=1;
+                continue;
+            }
+        }
+
+        fprintf(fp, "%s\n", username);
+        fclose(fp);
+
+    }
+
+
+    printf("Password: " );
 	scanf("%s",password);
 
 
@@ -64,5 +100,25 @@ int main() {
     printf("%s \n", password);
 
     shaGenerator(password);
+
+
+    //Signup
+    if(userFlag==1){
+        char pass_file_location[] ="passwords.txt";
+
+        fp = fopen(pass_file_location,"a+");
+
+        fprintf(fp, "%s %s ", username, tmp_s);
+
+        for(unsigned int i = 0; i < SHA256_BLOCK_SIZE; ++i){
+            fprintf(fp, "%02x", buf[i]);
+        }
+        
+        fprintf(fp,"\n");
+        
+        printf("Signed Up successfully");
+        fclose(fp);
+    }
+
     return 0;
 }
