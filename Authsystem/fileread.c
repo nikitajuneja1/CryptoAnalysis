@@ -9,11 +9,10 @@
 #define PASSMIN 10
 #define USERMAX 20
 
+
 char tmp_s[];
 CHAR buf[SHA256_BLOCK_SIZE];
-// CHAR tempBuf[SHA256_BLOCK_SIZE];
 
-// Random String Generator
 void gen_random(const int len) {
 
     static const char alphanum[] =
@@ -49,24 +48,19 @@ void shaGenerator(CHAR *hashstring)
 
 }
 
-int main() {
+int main(){
 
     int choice;
-    //char password[] = "aa";
-    CHAR password[PASSMIN];
-    CHAR username[USERMAX];
+    FILE *fp;
+    CHAR password[10];
+    CHAR username[20];
     
-    // File Input 
-    
-
-
     printf("Welcome!\n\t1.SignUp\n\t2.SignIn\n\t3.Exit\n");
     scanf("%d", &choice);
 
-    switch(choice){
-        case 1:
-        {
-            FILE *fp;
+    if(choice==1){
+
+            // FILE *fp;
             int userFlag=0;
             // New User
             while(userFlag==0){
@@ -131,77 +125,83 @@ int main() {
                 printf("Signed Up successfully");
                 fclose(fp);
             }
-        }
-            break;
+            exit(0);
 
-        case 2:
-            // int userflag=0;
-            {
-                
-                // File Input 
-                FILE *fp1;
-
+    }
+    if(choice == 3 ){
+        exit(0);
+    }
+    
                 printf("Username: " );
                 scanf("%s",username);
                 printf("Password: " );
                 scanf("%s",password);
 
-                
-                char password_file_location[] = "passwords.txt";
-                // char fileUser[USERMAX];
-                // CHAR tempPassword[PASSMIN];
-                // CHAR SHAvalue[64];
-                // char salt[64];
+    
+            // fp1 = fopen(password_file_location, "r");
+            char fileUser[20];
+            CHAR tempPassword[10];
+            CHAR SHAvalue[64];
+            char salt[7];
+            int match=0;
+            CHAR buffer[64];
 
-                char fileUser[20];
-                CHAR tempPassword[10];
-                CHAR SHAvalue[64];
-                char salt[7];
+            fp = fopen("passwords.txt","r");
 
-                fp1 = fopen(password_file_location, "r");
+            while(!feof(fp)){
 
-            
-                while(!feof(fp1)){
+                fscanf(fp, "%s %s %s", fileUser, salt, SHAvalue);
+
+                // printf("%s %s %s\n", fileUser, salt, SHAvalue);
+                if(strcmp(fileUser,username)==0){
+
+                    strcpy(tempPassword,password);
+                    // printf("%s \n", tempPassword);
+                    strcat(tempPassword,salt);
+                    // printf("%s \n", tempPassword);
+
+                    shaGenerator(tempPassword);
+
+                    // printf("New SHA value calculated :");
+
+                    FILE *fp1;
+                    fp1=fopen("tempHash.txt","w");
+
+                    for(unsigned int i = 0; i < SHA256_BLOCK_SIZE; ++i){
+                        fprintf(fp1,"%02x", buf[i]);
+                    }
+                    fclose(fp1);
+
+                    fp1=fopen("tempHash.txt","r");
+                    fscanf(fp1,"%s",buffer);
+                    fclose(fp1);
                     
+                    // printf("SHA value read from file :" );
 
-                    fscanf(fp1, "%s %s %s", fileUser, salt, SHAvalue);
-                    // fscanf(fp,"%s ",fileUser);
+                    for(int i=0; i<64;++i){
+                        // printf("%c", SHAvalue[i]);
 
-                    // printf("%s", fileUser);
-                    // printf("%s \n", salt);
-                    // printf("%s \n", &SHAvalue);
-                    printf("%s %s %s\n", fileUser, salt, SHAvalue);
-
-                    if(strcmp(fileUser,username)==0){
-
-                        // strcpy(tempPassword,password);
-                        // strcat(tempPassword,salt);
-
-                        // shaGenerator(tempPassword);
-
-                        // printf("New SHA value calculated :");
-
-                        // for(unsigned int i = 0; i < SHA256_BLOCK_SIZE; ++i){
-                        //     printf(fp, "%02x", buf[i]);
-                        // }
-
-                        // printf("SHA value read from file : %s", SHAvalue);
-                        break;
-
+                        if(buffer[i]==SHAvalue[i]){
+                            match=1;
+                            continue;
+                        }
+                        else
+                        {
+                            printf("\nPassword Not Matched \n");
+                            match=0;
+                            break;
+                        }
                     }
-                    else{
-                        // printf(" not ");
-                        continue;
+                    if(match==1){
+                        printf("\nPassword Matched\nLogin Successful");
                     }
-
+                    break;
+                }
+                else{
+                    continue;
                 }
             }
-            break;
 
-        case 3: exit(0);
-
-    }
-
-
+            
     return 0;
 }
