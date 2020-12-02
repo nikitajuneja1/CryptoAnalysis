@@ -21,10 +21,6 @@ void replaceAll(char *str, const char *oldWord, const char *newWord)
 
     owlen = strlen(oldWord);
 
-
-    /*
-     * Repeat till all occurrences are replaced. 
-     */
     while ((pos = strstr(str, oldWord)) != NULL)
     {
         // Bakup current line
@@ -32,10 +28,10 @@ void replaceAll(char *str, const char *oldWord, const char *newWord)
 
         // Index of current found word
         index = pos - str;
-
+        
         // Terminate str after word found index
         str[index] = '\0';
-
+        // printf("%s ",str);
         // Concatenate str with new word 
         strcat(str, newWord);
         
@@ -291,6 +287,10 @@ int main(){
     printf("\nYou can do the following things\n");
     printf("\t1.Change Username\n\t2.Change Password\n\t3.Logout\n");
     scanf("%d",&internalChoice);
+
+    if(internalChoice !=2 && internalChoice!=1 && internalChoice!=3){       
+        printf("Wrong Input!");
+    }
     
     // FILE *fp2;
 
@@ -362,49 +362,7 @@ int main(){
         internalChoice=3;
 
     }
-    if(internalChoice == 2){
-
-        FILE *fPtr;
-        FILE *fTemp;
-
-        char userBuffer[1000];
-        int userFlag=0;
-
-        printf("Enter New Password:\n");
-        scanf("%s", NewPassword);
-
-        // fp = fopen("passwords.txt","r");
-
-        // while(!feof(fp)){
-
-        // fscanf(fp, "%s %s %s", fileUser, salt, SHAvalue);
-
-        // strcat(password, salt);
-        // shaGenerator(password);
-
-        
-        // }
-        
-        
-        fPtr  = fopen("passwords.txt", "r");
-        fTemp = fopen("replacePass.tmp", "w"); 
-
-        while ((fgets(userBuffer, 1000, fPtr)) != NULL){
-            replaceAll(userBuffer, currentUser, newUsername);
-            fputs(userBuffer, fTemp);
-        }
-
-        fclose(fPtr);
-        fclose(fTemp);
-
-        remove("passwords.txt");
-
-        rename("replacePass.tmp", "passwords.txt");
-
-        printf("Password Changed Successfully");
-
-    }
-    if( internalChoice == 3){
+    if( internalChoice == 3 ){
         FILE *fp1;
 
         printf("You are logged Out.\n\n");
@@ -418,12 +376,93 @@ int main(){
 
         fprintf(fp1,"%s Logout Time: %s", currentUser, asctime(timeinfo));
         fclose(fp1);
-
+        exit(0);
     }
-    else{
-        printf("Wrong Input!");
-    }
+    // if(internalChoice == 2){
 
+        FILE *fPtr;
+        FILE *fT;
+
+        char userBuffer[1000];
+        // int passFlag=0;
+        // char tempSalt[6];
+
+
+        printf("Enter New Password:\n");
+        scanf("%s", NewPassword);
+
+        fp = fopen("passwords.txt","r");
+
+        while(!feof(fp)){
+
+            fscanf(fp, "%s %s %s", fileUser, salt, SHAvalue);
+
+            if(strcmp(fileUser,currentUser)==0){
+                // printf("This username already exists.\n");
+                // strcpy(tempSalt,salt);
+                // strcpy(buffer,SHAvalue);
+                break;
+            }
+            else{
+                continue;
+            }
+            // printf("%s %s %s \n", fileUser, salt, SHAvalue);
+        }
+
+        strcat(NewPassword, salt);
+        shaGenerator(NewPassword);
+
+        for(unsigned int i = 0; i < SHA256_BLOCK_SIZE; ++i){
+            printf("%02x", buf[i]);
+        }
+        fclose(fp);
+        
+        
+        fPtr  = fopen("passwords.txt", "r");
+        fT = fopen("replaceSHA.tmp", "w");
+        
+
+        FILE *fp1;
+
+        fp1=fopen("tempHash.txt","w");
+
+        for(unsigned int i = 0; i < SHA256_BLOCK_SIZE; ++i){
+            fprintf(fp1,"%02x", buf[i]);
+        }
+        fclose(fp1);
+
+        fp1=fopen("tempHash.txt","r");
+        fscanf(fp1,"%s",buffer);
+        fclose(fp1);
+
+
+
+        printf("\nBuffer: %s\n", buffer);
+
+        while ((fgets(userBuffer, 1000, fPtr)) != NULL){
+            replaceAll(userBuffer, SHAvalue, buffer);
+            fputs(userBuffer, fT);
+        }
+
+        fclose(fPtr);
+        fclose(fT);
+
+        remove("passwords.txt");
+        rename("replaceSHA.tmp", "passwords.txt");
+
+        printf("\nPassword Changed Successfully\nYou are logged out.\nPlease Login with new password\n");
+
+        time_t rawtime;
+        struct tm * timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        
+        fp1=fopen("sessionLogs.txt","a+");
+
+        fprintf(fp1,"%s Logout Time: %s", currentUser, asctime(timeinfo));
+        fclose(fp1);
+
+    // }
 
     return 0;
 }
